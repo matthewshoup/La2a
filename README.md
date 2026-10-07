@@ -11,3 +11,5 @@ First engineering build:
 - Peak Reduction, Gain, Tube Drive, Hot Bias, T4 Age and Iron controls
 
 This is an original circuit-inspired DSP implementation, not an official Teletronix/Universal Audio product.
+
+Build status: first universal macOS validation triggered.
