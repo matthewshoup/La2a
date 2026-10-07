@@ -1,14 +1,31 @@
 name: macOS Universal Build
 on: [workflow_dispatch, push]
+
 jobs:
   build:
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
+
       - name: Configure
         run: cmake -S . -B build -G Xcode -DCMAKE_BUILD_TYPE=Release
+
       - name: Build
         run: cmake --build build --config Release --target La2a_VST3 La2a_AU La2a_Standalone
+
+      - name: Ad-hoc code sign
+        run: |
+          set -euo pipefail
+          ARTEFACTS="build/La2a_artefacts/Release"
+
+          codesign --force --deep --sign - "$ARTEFACTS/VST3/LA2A.vst3"
+          codesign --force --deep --sign - "$ARTEFACTS/AU/LA2A.component"
+          codesign --force --deep --sign - "$ARTEFACTS/Standalone/LA2A.app"
+
+          codesign --verify --deep --strict --verbose=2 "$ARTEFACTS/VST3/LA2A.vst3"
+          codesign --verify --deep --strict --verbose=2 "$ARTEFACTS/AU/LA2A.component"
+          codesign --verify --deep --strict --verbose=2 "$ARTEFACTS/Standalone/LA2A.app"
+
       - uses: actions/upload-artifact@v4
         with:
           name: La2a-macOS-universal
